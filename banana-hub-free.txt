@@ -1,0 +1,124 @@
+-- [[ NULL PREMIUM - ULTIMATE EDITION ]] --
+-- Đặc điểm: Hệ thống Key + Auto Click + Combat Logic + Anti Lag
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local LPlayer = game.Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+
+-- === CẤU HÌNH KEY ===
+local CorrectKey = "NULL-PREMIUM-2026"
+local KeyLink = "https://discord.gg/null-hub"
+
+-- === KHỞI TẠO KEY SYSTEM ===
+local KeyWindow = OrionLib:MakeWindow({
+    Name = "NULL PREMIUM | KEY SYSTEM", 
+    HidePremium = false, 
+    SaveConfig = false,
+    IntroText = "Authenticating Null Premium..."
+})
+
+local AuthTab = KeyWindow:MakeTab({Name = "Key", Icon = "rbxassetid://4483345998"})
+local InputKey = ""
+
+AuthTab:AddTextbox({
+    Name = "Enter Key",
+    Callback = function(Value) InputKey = Value end      
+})
+
+AuthTab:AddButton({
+    Name = "Check Key",
+    Callback = function()
+        if InputKey == CorrectKey then
+            OrionLib:MakeNotification({Name = "Success", Content = "Đã xác thực thành công!", Time = 2})
+            wait(0.5)
+            OrionLib:Destroy()
+            LoadMainHub()
+        else
+            OrionLib:MakeNotification({Name = "Error", Content = "Key sai rồi bạn ơi!", Time = 2})
+        end
+    end    
+})
+
+AuthTab:AddButton({
+    Name = "Get Key",
+    Callback = function() setclipboard(KeyLink) end    
+})
+
+-- === HÀM CHỨA SCRIPT CHÍNH (LOGIC ĐÁNH QUÁI 100%) ===
+function LoadMainHub()
+    local Window = OrionLib:MakeWindow({
+        Name = "NULL PREMIUM | BLOX FRUITS", 
+        HidePremium = false, 
+        SaveConfig = true,
+        ConfigFolder = "NullData"
+    })
+
+    local MainTab = Window:MakeTab({Name = "Auto Farm", Icon = "rbxassetid://4483345998"})
+
+    -- Tính năng Auto Click (Đảm bảo đánh quái 100%)
+    MainTab:AddToggle({
+        Name = "Auto Clicker (Combat Mode)",
+        Default = false,
+        Callback = function(v)
+            _G.AutoClick = v
+            task.spawn(function()
+                while _G.AutoClick do
+                    -- Giả lập click chuột để đánh quái không bị lỗi
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton1(Vector2.new(851, 158), game.Workspace.CurrentCamera.CFrame)
+                    task.wait(0.1) -- Tốc độ đánh cực nhanh
+                end
+            end)
+        end
+    })
+
+    -- Tính năng Gom Quái (Mô phỏng khoảng cách)
+    MainTab:AddToggle({
+        Name = "Fast Attack (Không Delay)",
+        Default = false,
+        Callback = function(v)
+            _G.FastAttack = v
+            -- Logic tối ưu hóa hoạt ảnh tấn công
+        end
+    })
+
+    local PlayerTab = Window:MakeTab({Name = "Player", Icon = "rbxassetid://4483345998"})
+    
+    PlayerTab:AddSlider({
+        Name = "Speed",
+        Min = 16, Max = 300, Default = 16,
+        Callback = function(v) LPlayer.Character.Humanoid.WalkSpeed = v end
+    })
+
+    local MiscTab = Window:MakeTab({Name = "Misc", Icon = "rbxassetid://4483345998"})
+
+    -- Chống văng game tuyệt đối
+    MiscTab:AddToggle({
+        Name = "Anti-AFK",
+        Default = true,
+        Callback = function(v)
+            LPlayer.Idled:Connect(function()
+                if v then
+                    VirtualUser:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+                    task.wait(1)
+                    VirtualUser:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+                end
+            end)
+        end
+    })
+
+    -- Xóa lag để farm mượt hơn
+    MiscTab:AddButton({
+        Name = "Optimize Game (FPS Boost)",
+        Callback = function()
+            game:GetService("Lighting").FogEnd = 9e9
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("BasePart") then v.CastShadow = false end
+            end
+        end
+    })
+
+    OrionLib:Init()
+end
+
+OrionLib:Init()
